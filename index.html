@@ -20,6 +20,7 @@
         }
         h1 {
             color: #333;
+            text-align: center;
         }
         .container {
             background: #fff;
@@ -28,6 +29,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             max-width: 600px;
             width: 100%;
+            box-sizing: border-box;
         }
         textarea {
             width: 100%;
@@ -39,7 +41,7 @@
             font-size: 16px;
             resize: vertical;
         }
-        select, button {
+        select, button, input[type="file"] {
             width: 100%;
             padding: 10px;
             font-size: 16px;
@@ -47,6 +49,7 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             background-color: #fff;
+            box-sizing: border-box;
         }
         button {
             background-color: #4CAF50;
@@ -63,11 +66,63 @@
             white-space: pre-wrap;
             word-wrap: break-word;
         }
+        .dropzone {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 16px;
+            color: #aaa;
+            margin-bottom: 20px;
+            position: relative;
+            box-sizing: border-box;
+        }
+        .dropzone.dragover {
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+        .dropzone input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Media Queries for Responsive Design */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            .container {
+                padding: 15px;
+            }
+            textarea {
+                height: 120px;
+                font-size: 14px;
+            }
+            select, button, input[type="file"] {
+                padding: 8px;
+                font-size: 14px;
+            }
+            button {
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>GXT文本生成校验</h1>
+        <div class="dropzone" id="dropzone">
+            拖放TXT文件到此区域或点击浏览
+            <input type="file" id="fileInput" accept=".txt">
+        </div>
         <textarea id="inputText" placeholder="在此输入文本..."></textarea>
         <label for="regexType">选择文本类型:</label>
         <select id="regexType">
@@ -80,6 +135,51 @@
     </div>
 
     <script>
+        document.getElementById('dropzone').addEventListener('dragover', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.target.classList.add('dragover');
+        });
+
+        document.getElementById('dropzone').addEventListener('dragleave', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.target.classList.remove('dragover');
+        });
+
+        document.getElementById('dropzone').addEventListener('drop', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.target.classList.remove('dragover');
+
+            const files = event.dataTransfer.files;
+            if (files.length) {
+                const file = files[0];
+                if (file.type === "text/plain") {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('inputText').value = e.target.result;
+                    };
+                    reader.readAsText(file);
+                } else {
+                    alert('请拖入一个文本文件.');
+                }
+            }
+        });
+
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file && file.type === "text/plain") {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('inputText').value = e.target.result;
+                };
+                reader.readAsText(file);
+            } else {
+                alert('请选择一个文本文件.');
+            }
+        });
+
         function validateText() {
             const text = document.getElementById('inputText').value;
             const regexType = document.getElementById('regexType').value;
