@@ -4,212 +4,92 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GXT文本生成校验</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background-color: #f5f5f5;
-            min-height: 100vh;
-            box-sizing: border-box;
-            padding: 20px;
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        .container {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        textarea {
-            width: 100%;
-            height: 150px;
-            margin-bottom: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 16px;
-            resize: vertical;
-            box-sizing: border-box;
-        }
-        select, button, input[type="file"] {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background-color: #fff;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        pre {
-            background-color: #f4f4f4;
-            padding: 10px;
-            border-radius: 4px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        .dropzone {
-            border: 2px dashed #ccc;
-            padding: 20px;
-            border-radius: 4px;
-            text-align: center;
-            font-size: 16px;
-            color: #aaa;
-            margin-bottom: 20px;
-            position: relative;
-            box-sizing: border-box;
-            width: 100%;
-        }
-        .dropzone.dragover {
-            border-color: #4CAF50;
-            color: #4CAF50;
-        }
-        .dropzone input[type="file"] {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-            box-sizing: border-box;
-        }
-
-        /* Media Queries for Responsive Design */
-        @media (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
-            h1 {
-                font-size: 24px;
-            }
-            .container {
-                padding: 15px;
-            }
-            textarea {
-                height: 120px;
-                font-size: 14px;
-            }
-            select, button, input[type="file"] {
-                padding: 8px;
-                font-size: 14px;
-            }
-            button {
-                padding: 10px;
-            }
-        }
-    </style>
+    <link href="./css/styles.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1>GXT文本生成校验</h1>
-        <div class="dropzone" id="dropzone">
-            拖放TXT文件到此区域或点击浏览
-            <input type="file" id="fileInput" accept=".txt">
+        <header>
+            <h1>GXT文本生成校验</h1>
+            <p>高效验证文本格式，实时反馈结果</p>
+        </header>
+
+        <div class="grid-container">
+            <!-- 左侧：输入区域 -->
+            <div class="input-section">
+                <h2><i class="fa-solid fa-keyboard"></i> 输入区域</h2>
+
+                <div class="input-container">
+                    <div class="textarea-wrapper">
+                        <textarea id="inputText" placeholder="在此输入文本内容..."></textarea>
+                        <div class="char-counter" id="charCount">0 字符</div>
+                    </div>
+
+                    <div class="controls">
+                        <div class="select-wrapper">
+                            <select id="regexType">
+                                <option value="III">III 格式</option>
+                                <option value="VC">VC 格式</option>
+                                <option value="SA">SA 格式</option>
+                            </select>
+                            <div class="select-arrow">
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <button id="validateBtn">
+                            <i class="fa-solid fa-check"></i> 验证文本
+                        </button>
+                    </div>
+                </div>
+
+                <div class="dropzone" id="dropzone">
+                    <i class="fa-solid fa-file-text"></i>
+                    <p>拖放TXT文件到此处或</p>
+                    <label>
+                        <span>
+                            <i class="fa-solid fa-folder-open"></i> 浏览文件
+                        </span>
+                        <input type="file" id="fileInput" accept=".txt">
+                    </label>
+                </div>
+            </div>
+
+            <!-- 右侧：输出区域 -->
+            <div class="output-section">
+                <div class="output-header">
+                    <h2><i class="fa-solid fa-comments"></i> 验证结果</h2>
+                    <div id="statusIndicator">
+                        <span class="pulse-dot"></span>
+                        <span>处理中...</span>
+                    </div>
+                </div>
+
+                <div class="chat-container">
+                    <div id="chatMessages" class="chat-messages">
+                        <!-- 初始欢迎消息 -->
+                        <div class="message-bubble bot-bubble">
+                            <p>欢迎使用GXT文本校验工具，请输入文本或上传文件开始验证。</p>
+                            <div class="message-meta">
+                                <span>系统</span>
+                                <span id="welcomeTime"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-footer">
+                        <span id="validationSummary">未进行验证</span>
+                        <button id="clearChat">
+                            <i class="fa-solid fa-trash"></i> 清空
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <textarea id="inputText" placeholder="在此输入文本..."></textarea>
-        <label for="regexType">选择文本类型:</label>
-        <select id="regexType">
-            <option value="III">III</option>
-            <option value="VC">VC</option>
-            <option value="SA">SA</option>
-        </select>
-        <button onclick="validateText()">验证</button>
-        <pre id="output"></pre>
+
+        <footer>
+            <p>By Lzh10_慕黑 GXT文本校验工具 | 高效、准确、便捷</p>
+        </footer>
     </div>
 
-    <script>
-        document.getElementById('dropzone').addEventListener('dragover', function(event) {
-            event.preventDefault();
-            event.stopPropagation();
-            event.target.classList.add('dragover');
-        });
-
-        document.getElementById('dropzone').addEventListener('dragleave', function(event) {
-            event.preventDefault();
-            event.stopPropagation();
-            event.target.classList.remove('dragover');
-        });
-
-        document.getElementById('dropzone').addEventListener('drop', function(event) {
-            event.preventDefault();
-            event.stopPropagation();
-            event.target.classList.remove('dragover');
-
-            const files = event.dataTransfer.files;
-            if (files.length) {
-                const file = files[0];
-                if (file.type === "text/plain") {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        document.getElementById('inputText').value = e.target.result;
-                    };
-                    reader.readAsText(file);
-                } else {
-                    alert('请拖入一个文本文件.');
-                }
-            }
-        });
-
-        document.getElementById('fileInput').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file && file.type === "text/plain") {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('inputText').value = e.target.result;
-                };
-                reader.readAsText(file);
-            } else {
-                alert('请选择一个文本文件.');
-            }
-        });
-
-        function validateText() {
-            const text = document.getElementById('inputText').value;
-            const regexType = document.getElementById('regexType').value;
-            const lines = text.split('\n');
-            let regex;
-
-            switch (regexType) {
-                case 'III':
-                    regex = /^(([0-9a-zA-Z_]{1,7})=(.*))$/;
-                    break;
-                case 'VC':
-                    regex = /^(\[([0-9A-Z_]{1,7})\])$|^(([0-9A-Z_]{1,7})=(.*))$/;
-                    break;
-                case 'SA':
-                    regex = /^(\[([0-9A-Z_]{1,7})\])$|^(([0-9a-fA-F]{1,8})=(.*))$/;
-                    break;
-            }
-
-            const output = [];
-            lines.forEach((line, index) => {
-                if (line.trim() && !regex.test(line)) {
-                    output.push(`第 ${index + 1} 行: ${line}`);
-                }
-            });
-
-            document.getElementById('output').innerText = output.join('\n') || '所有行都符合要求。';
-        }
-    </script>
+    <script src="./js/main.js" type="module"></script>
 </body>
 </html>
